@@ -9,7 +9,7 @@
     "build": "rollup -c --bundleConfigAsCjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "publish": "npm run build && npm publish --tag public"
+    "publish": "rollup -c --bundleConfigAsCjs && npm publish --tag public"
   },
   "author": "tryferos",
   "license": "ISC",
