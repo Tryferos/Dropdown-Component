@@ -1,7 +1,15 @@
 
 node_modules
 .env
+
 dist
-.storybook
 src/stories
 
+.storybook
+.storybook/preview.js
+.storybook/**
+
+.rollup.cache
+.rollup
+
+src
