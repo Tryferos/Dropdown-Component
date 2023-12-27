@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "outDir": "./compiled",
+        "declaration": true,
+        "declarationDir": "dist/types",
+        "rootDir": "./src",
+        "moduleResolution": "node",
+        "emitDeclarationOnly": true,
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "preserve",
+        "incremental": true,
+        "tsBuildInfoFile": ".tsbuildinfo",
+        "plugins": [
+          {
+            "name": "react"
+          }
+        ]
+    },
+    "include": ["./src/**/*"],
+    "exclude": ["node_modules", "./src/stories", "dist", "src/tailwind.css"]
+}

@@ -6,3 +6,7 @@ node_modules/
 src/
 postcss.config.js
 .github
+.rollup.cache
+.rollup
+tsconfig.json
+.tsbuildinfo

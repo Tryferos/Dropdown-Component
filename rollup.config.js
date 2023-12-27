@@ -6,36 +6,62 @@ import tailwindcss from "tailwindcss";
 import autoprefixer from "autoprefixer";
 import terser from "@rollup/plugin-terser";
 
+import typescript from "@rollup/plugin-typescript";
+import { dts } from "rollup-plugin-dts";
+
 process.env.NODE_ENV = 'production';
 
-export default {
-  input: "./src/index.js",
-  output: [
-    {
-      file: "dist/index.es.js",
-      format: "esm",
-    },
-    {
-      file: "dist/index.js",
-      format: "cjs",
-    },
-  ],
-  plugins: [
-    postcss({
-      plugins: [tailwindcss("./tailwind.config.js"), autoprefixer()],
-      minimize: true,
-      inject: {
-        insertAt: "top",
+export default [
+  {
+    input: "./src/index.ts",
+    output: [
+      {
+        file: "dist/index.cjs",
+        format: "cjs",
       },
-    }),
-    babel({
-      babelHelpers: "bundled",
-      extensions: [".js", ".jsx"],
-      presets: ["@babel/preset-react"],
-      exclude: "node_modules/**",
-    }),
-    resolve(),
-    external(),
-    terser(),
-  ],
-}
+      {
+        file: "dist/index.mjs",
+        format: "es",
+      },
+    ],
+    plugins: [
+      postcss({
+        plugins: [tailwindcss("./tailwind.config.js"), autoprefixer()],
+        minimize: true,
+        inject: {
+          insertAt: "top",
+        },
+      }),
+      babel({
+        babelHelpers: "bundled",
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+        presets: ["@babel/preset-react"],
+        exclude: "node_modules/**",
+      }),
+      resolve(),
+      external(),
+      typescript(),
+    ],
+  },
+  { //TYPESCRIPT
+    input: "./src/index.ts",
+    output: [
+      {
+        file: "dist/index.d.ts",
+        format: "es",
+      }
+    ],
+    external: ["react", "react-dom", /\.css$/],
+    plugins: [
+      babel({
+        babelHelpers: "bundled",
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+        presets: ["@babel/preset-react", "@babel/preset-typescript"],
+        exclude: "node_modules/**",
+      }),
+      resolve(),
+      external(),
+      dts({tsconfig: './tsconfig.json'}),
+    ],
+  },
+]

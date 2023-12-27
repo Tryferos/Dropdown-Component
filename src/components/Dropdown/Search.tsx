@@ -1,10 +1,15 @@
 import React from 'react'
 import '../../tailwind.css'
 
-export function Dropdown () {
+export interface SearchProps {
+    title: string;
+}
+
+export const Search: React.FC<SearchProps> = ({title: name}) => {
     return (
         <div className='text-red-500 font-bold w-10 h-10 flex justify-center'>
-            hello world!
+            {name}
         </div>
     )
 }
+
