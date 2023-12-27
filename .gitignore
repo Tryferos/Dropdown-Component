@@ -10,6 +10,7 @@ src/stories
 .storybook/**
 
 .rollup.cache
+.rollup.cache/**
 .rollup
 
 src
