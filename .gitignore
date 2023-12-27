@@ -13,4 +13,5 @@ src/stories
 .rollup.cache/**
 .rollup
 
+.tsbuildinfo
 src
