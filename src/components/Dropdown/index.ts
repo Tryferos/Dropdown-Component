@@ -1,3 +1,4 @@
 import '../../tailwind.css'
 
-export * from './Dropdown.tsx'
+export * from './SimpleDropdown.tsx'
+export * from './CategorizedDropdown.tsx'
