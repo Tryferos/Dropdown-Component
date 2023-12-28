@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
+  "keywords": ["react", "react-components", "components", "dropdown", "types", "typescript", "tryferos"],
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
