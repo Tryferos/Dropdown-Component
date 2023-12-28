@@ -1,6 +1,7 @@
 # Dropdown Components
 
 [Install the package for npm here.](https://www.npmjs.com/package/@tryferos/dropdown)
+
 [Project's Github page](https://github.com/Tryferos/Dropdown-Component)
 
 This is a **react component** delivering various **Editable Dropdowns** that you can use in your projects, which also adds **types** support using Typescript.
