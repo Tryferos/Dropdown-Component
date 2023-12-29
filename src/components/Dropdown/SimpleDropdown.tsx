@@ -21,6 +21,9 @@ export interface SimpleDropdownProps<T> {
     title: string;
     animation?: DropdownAnimationProps;
     selected: T | null;
+    maxHeight?: string;
+    minWidth?: string;
+    maxWidth?: string;
     items: T[];
     onSelect: (item: T) => void;
     size?: DropdownSize;
@@ -35,36 +38,49 @@ export function SimpleDropdown<T extends ReactNode & {}>(props: DropdownProps<T>
 
     const [isOpen, setIsOpen] = useState(openByDefault || false);
 
+    const maxHeight = props.maxHeight || '250px';
+
     const handleOpen = () => setIsOpen(!isOpen);
 
     useEffect(() => {
     }, [])
     return (
-        <DropdownWrapper title={title} selected={selected} size={props.size} onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed}>
+        <DropdownWrapper maxWidth={props.maxWidth} minWidth={props.minWidth} title={title} selected={selected} size={props.size} onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed}>
             <AnimatePresence>
                 {isOpen &&
-                    <DropdownItems items={items} selected={selected} onSelect={onSelect} animation={animation} />
+                    <DropdownItems maxHeight={maxHeight} items={items} selected={selected} onSelect={onSelect} animation={animation} />
                 }
             </AnimatePresence>
         </DropdownWrapper>
     )
 }
 
-function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | 'onSelect' | 'animation'>) {
+function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | 'onSelect' | 'animation' | 'maxHeight'>) {
     const { items, selected, onSelect, animation } = props;
     const animate = animation?.animate || false;
     const animateChildren = (animate && animation?.animateChildren) || false;
     const offset = (animation?.delayPerChild || 0.2)
+    const ref = React.useRef<HTMLUListElement>(null);
+    useEffect(() => {
+        if (ref.current == null || !ref) return;
+        ref.current.style.maxHeight = `calc(0px + ${props.maxHeight})`;
+        setTimeout(() => {
+            //* fix showing scrollbar for a small time period when not needed
+            if (ref.current == null || !ref) return;
+            ref.current.style.overflowY = 'auto';
+        }, 201)
+    }, [props.maxHeight, ref])
     return (
         <motion.ul
+            ref={ref}
             initial={{ height: 0 }}
             animate={{ height: 'auto' }}
             exit={{ height: 0, transition: { duration: offset } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
-            className='*:border-b-[1px] *:border-b-gray-200 *:cursor-pointer'>
+            className='*:border-b-[1px] *:border-b-gray-200 *:cursor-pointer scrollbar'>
             {
                 items.map((item, index) => {
-                    const delay = animateChildren ? (offset * index) : offset;
+                    const delay = animateChildren ? (offset * Math.min(index, 10)) : offset;
                     return (
                         <AnimationListItem
                             key={index}
@@ -86,7 +102,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
 
 export function DropdownWrapper<T>(
     props:
-        Pick<DropdownProps<T>, 'title' | 'size' | 'selected' | 'showTitleIfClosed'> &
+        Pick<DropdownProps<T>, 'title' | 'size' | 'selected' | 'showTitleIfClosed' | 'maxWidth' | 'minWidth'> &
         { children: ReactNode; onOpen: () => void; isOpen: boolean }) {
 
     const { title: vTitle, children, isOpen, selected } = props;
@@ -99,6 +115,8 @@ export function DropdownWrapper<T>(
         const size = parseInt(props.size || DropdownSize.sm);
         if (ref.current == null || !ref) return;
 
+        ref.current.style.minWidth = props.minWidth || '125px';
+        ref.current.style.maxWidth = props.maxWidth || '100%';
         ref.current.style.width = `${size}%`;
 
     }, [props.size, ref])

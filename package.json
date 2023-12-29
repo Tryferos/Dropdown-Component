@@ -1,6 +1,6 @@
 {
   "name": "@tryferos/dropdown",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
@@ -21,7 +21,7 @@
     "build:linux:darwin": "(rm dist -r -f) && rollup -c --bundleConfigAsCjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "publish-build": "npm version patch && npm run build && npm publish --tag public"
+    "publish-build": "npm run build && npm publish --tag public"
   },
   "author": "tryferos",
   "license": "ISC",

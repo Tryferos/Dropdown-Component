@@ -30,14 +30,15 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: DropdownPro
     const { categories } = props;
     const [isOpen, setIsOpen] = useState(openByDefault || false);
     const handleOpen = () => setIsOpen(!isOpen);
+    const maxHeight = props.maxHeight || '250px';
     return (
-        <DropdownWrapper
+        <DropdownWrapper maxWidth={props.maxWidth} minWidth={props.minWidth}
             title={title} selected={selected.item} size={props.size}
             onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed} >
             <AnimatePresence>
                 {
                     isOpen &&
-                    <DropdownItems animation={animation} categories={categories} onSelect={props.onSelect} selected={props.selected} />
+                    <DropdownItems maxHeight={maxHeight} animation={animation} categories={categories} onSelect={props.onSelect} selected={props.selected} />
                 }
             </AnimatePresence>
         </DropdownWrapper>
@@ -45,22 +46,33 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: DropdownPro
 }
 
 
-function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animation'>
+function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animation' | 'maxHeight'>
     & ExtraProps<T>) {
     const { categories, animation } = props;
     const animate = animation?.animate || false;
     const animateChildren = (animate && animation?.animateChildren) || false;
     const offset = (animation?.delayPerChild || 0.2)
+    const ref = React.useRef<HTMLUListElement>(null);
+    useEffect(() => {
+        if (ref.current == null || !ref) return;
+        ref.current.style.maxHeight = props.maxHeight || '250px';
+        setTimeout(() => {
+            //* fix showing scrollbar for a small time period when not needed
+            if (ref.current == null || !ref) return;
+            ref.current.style.overflowY = 'auto';
+        }, 201)
+    }, [ref, props.maxHeight])
     return (
         <motion.ul
+            ref={ref}
             initial={{ height: 0 }}
             animate={{ height: 'auto' }}
             exit={{ height: 0, transition: { duration: offset } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
-            className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200'>
+            className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200 scrollbar'>
             {
                 categories.map((category, vIndex) => {
-                    const delay = animateChildren ? ((categories[vIndex - 1]?.items.length || 0) * offset + 0.2) : offset
+                    const delay = animateChildren ? ((Math.min(categories[vIndex - 1]?.items.length || 0, 4)) * offset + 0.2) : offset
                     return (
                         <Fragment key={vIndex}>
                             <AnimationListItem
@@ -75,7 +87,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
                             </AnimationListItem>
                             {
                                 category.items.map((item, index) => {
-                                    const addedDelay = animateChildren ? (delay + offset * index) : offset;
+                                    const addedDelay = animateChildren ? (delay + offset * Math.min(index + vIndex, 10)) : offset;
                                     return (
                                         <AnimationListItem
                                             key={vIndex + "-" + index}
