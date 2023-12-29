@@ -1,6 +1,8 @@
 import React, { useEffect, useState, ReactNode } from 'react'
 import '../../tailwind.css'
 import { Arrow } from '../../svg';
+import { AnimatePresence, motion } from 'framer-motion'
+import { AnimationListItem } from './CategorizedDropdown';
 
 export enum DropdownSize {
     'sm' = '25',
@@ -29,7 +31,7 @@ export interface SimpleDropdownProps<T> {
 type DropdownProps<T> = SimpleDropdownProps<T>;
 
 export function SimpleDropdown<T extends ReactNode & {}>(props: DropdownProps<T>) {
-    const { title, selected, items, onSelect, openByDefault } = props;
+    const { title, selected, items, onSelect, openByDefault, animation } = props;
 
     const [isOpen, setIsOpen] = useState(openByDefault || false);
 
@@ -39,28 +41,45 @@ export function SimpleDropdown<T extends ReactNode & {}>(props: DropdownProps<T>
     }, [])
     return (
         <DropdownWrapper title={title} selected={selected} size={props.size} onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed}>
-            <DropdownItems items={items} selected={selected} onSelect={onSelect} isOpen={isOpen} />
+            <AnimatePresence>
+                {isOpen &&
+                    <DropdownItems items={items} selected={selected} onSelect={onSelect} animation={animation} />
+                }
+            </AnimatePresence>
         </DropdownWrapper>
     )
 }
 
-function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | 'onSelect'> & { isOpen: boolean }) {
-    const { items, selected, onSelect, isOpen } = props;
+function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | 'onSelect' | 'animation'>) {
+    const { items, selected, onSelect, animation } = props;
+    const animate = animation?.animate || false;
+    const animateChildren = (animate && animation?.animateChildren) || false;
+    const offset = (animation?.delayPerChild || 0.2)
     return (
-        <ul className='min-h-[0px]'>
-            {props.isOpen &&
+        <motion.ul
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0, transition: { duration: offset } }}
+            transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
+            className='*:border-b-[1px] *:border-b-gray-200 *:cursor-pointer'>
+            {
                 items.map((item, index) => {
+                    const delay = animateChildren ? (offset * index) : offset;
                     return (
-                        <li onChange={() => onSelect(item)}
-                            className={`border-b-[1px] border-b-gray-200 cursor-pointer hover:bg-gray-100
-                            ${(selected == item) ? 'bg-gray-200' : ''}`}
-                            key={index} onClick={() => onSelect(item)}>
+                        <AnimationListItem
+                            key={index}
+                            animate={animate}
+                            delay={delay}
+                            index={index}
+                            onClick={() => onSelect(item)}
+                            className={`hover:bg-gray-100 ${(selected == item) ? 'bg-gray-200' : ''}`}
+                        >
                             <p className='px-2 py-1 first-letter:uppercase select-none'>{item as ReactNode}</p>
-                        </li>
+                        </AnimationListItem>
                     )
                 })
             }
-        </ul>
+        </motion.ul>
     )
 }
 

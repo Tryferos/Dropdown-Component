@@ -1,5 +1,5 @@
 import { SimpleDropdownProps, DropdownWrapper } from "./SimpleDropdown";
-import React, { useState, useEffect, ReactNode, Fragment, lazy } from 'react'
+import React, { useState, useEffect, ReactNode, Fragment, lazy, FC } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 type Item<T> = {
@@ -44,6 +44,7 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: DropdownPro
     )
 }
 
+
 function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animation'>
     & ExtraProps<T>) {
     const { categories, animation } = props;
@@ -56,44 +57,42 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
             animate={{ height: 'auto' }}
             exit={{ height: 0, transition: { duration: offset } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
-            className=''>
+            className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200'>
             {
                 categories.map((category, vIndex) => {
                     const delay = animateChildren ? ((categories[vIndex - 1]?.items.length || 0) * offset + 0.2) : offset
                     return (
                         <Fragment key={vIndex}>
-                            <motion.li
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0, transition: { duration: 0 } }}
-                                transition={{ duration: animate ? offset : 0, delay: animate ? (delay) : 0 }}
-                                className='border-b-[1px] select-none flex items-center text-gray-600 text-lg border-b-gray-200'
-                                key={vIndex}>
+                            <AnimationListItem
+                                animate={animate}
+                                delay={delay}
+                                index={vIndex}
+                                onClick={() => { }}
+                                className=' text-gray-600 text-lg '>
                                 <p className='px-2 py-1 first-letter:uppercase select-none'>
                                     {category.title as ReactNode}
                                 </p>
-                            </motion.li>
+                            </AnimationListItem>
                             {
                                 category.items.map((item, index) => {
                                     const addedDelay = animateChildren ? (delay + offset * index) : offset;
                                     return (
-                                        <motion.li
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0, transition: { duration: 0 } }}
-                                            transition={{ duration: animate ? offset : 0, delay: animate ? (addedDelay) : 0 }}
+                                        <AnimationListItem
+                                            key={vIndex + "-" + index}
+                                            animate={animate}
+                                            delay={addedDelay}
+                                            index={index}
                                             onClick={() =>
                                                 item.disabled != true &&
                                                 props.onSelect({ item: item.item, category: { title: category.title } })}
-                                            className={`select-none border-b-[1px] flex items-center border-b-gray-200 ${props.selected.category.title == category.title && props.selected.item == item.item && 'bg-gray-200'}
+                                            className={` ${props.selected.category.title == category.title && props.selected.item == item.item && 'bg-gray-200'}
                                             ${item.disabled == true ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer'} `}
-                                            key={index}>
-
+                                        >
                                             <div className={`w-[6px] ml-3 h-[6px] rounded-full bg-slate-500`}></div>
                                             <p className='px-2 py-1 first-letter:uppercase select-none'>
                                                 {item.item as ReactNode}
                                             </p>
-                                        </motion.li>
+                                        </AnimationListItem>
                                     )
                                 })
                             }
@@ -104,3 +103,31 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
         </motion.ul>
     )
 }
+
+export const AnimationListItem: FC<
+    {
+        index: number;
+        delay: number;
+        animate: boolean
+        className: string;
+        onClick: () => void;
+        children: ReactNode;
+    }
+>
+    = (props) => {
+
+        const { index, delay, animate, className, onClick, children } = props;
+
+        return (
+            <motion.li
+                onClick={onClick}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0 } }}
+                transition={{ duration: animate ? 0.2 : 0, delay: animate ? (delay) : 0 }}
+                className={className}
+            >
+                {children}
+            </motion.li>
+        )
+    }
