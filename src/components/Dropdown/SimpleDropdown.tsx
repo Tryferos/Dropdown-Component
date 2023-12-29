@@ -12,7 +12,7 @@ export enum DropdownSize {
 }
 
 export type DropdownAnimationProps = {
-    animate: boolean;
+    animate?: boolean;
     animateChildren?: boolean;
     delayPerChild?: 0.1 | 0.2 | 0.3 | 0.4 | 0.5;
 }
@@ -57,8 +57,8 @@ export function SimpleDropdown<T extends ReactNode & {}>(props: DropdownProps<T>
 
 function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | 'onSelect' | 'animation' | 'maxHeight'>) {
     const { items, selected, onSelect, animation } = props;
-    const animate = animation?.animate || false;
-    const animateChildren = (animate && animation?.animateChildren) || false;
+    const animate = animation?.animate ?? true;
+    const animateChildren = (animate && animation?.animateChildren) ?? true;
     const offset = (animation?.delayPerChild || 0.2)
     const ref = React.useRef<HTMLUListElement>(null);
     useEffect(() => {
@@ -75,7 +75,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
             ref={ref}
             initial={{ height: 0 }}
             animate={{ height: 'auto' }}
-            exit={{ height: 0, transition: { duration: offset } }}
+            exit={{ height: 0, transition: { duration: animate ? offset : 0 } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
             className='*:border-b-[1px] *:border-b-gray-200 *:cursor-pointer scrollbar'>
             {

@@ -36,6 +36,12 @@ This package is build using react 17, you can use with different versions of rea
   npm install @tryferos/dropdown@latest --force
 ```
 
+Import the components
+
+```javascript
+import { SimpleDropdown, CategorizedDropdown } from "@tryferos/dropdown";
+```
+
 ## Acknowledgements
 
 -   [Heroicons](https://awesomeopensource.com/project/elangosundar/awesome-README-templates)

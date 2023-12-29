@@ -49,8 +49,8 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: DropdownPro
 function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animation' | 'maxHeight'>
     & ExtraProps<T>) {
     const { categories, animation } = props;
-    const animate = animation?.animate || false;
-    const animateChildren = (animate && animation?.animateChildren) || false;
+    const animate = animation?.animate ?? true;
+    const animateChildren = (animate && animation?.animateChildren) ?? true;
     const offset = (animation?.delayPerChild || 0.2)
     const ref = React.useRef<HTMLUListElement>(null);
     useEffect(() => {
@@ -67,7 +67,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
             ref={ref}
             initial={{ height: 0 }}
             animate={{ height: 'auto' }}
-            exit={{ height: 0, transition: { duration: offset } }}
+            exit={{ height: 0, transition: { duration: animate ? offset : 0 } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
             className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200 scrollbar'>
             {
@@ -136,7 +136,7 @@ export const AnimationListItem: FC<
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0, transition: { duration: 0 } }}
-                transition={{ duration: animate ? 0.2 : 0, delay: animate ? (delay) : 0 }}
+                transition={{ duration: animate ? 0.2 : 0, delay: animate ? (delay) : 0.22 }}
                 className={className}
             >
                 {children}
