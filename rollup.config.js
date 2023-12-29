@@ -61,7 +61,7 @@ export default [
       }),
       resolve(),
       external(),
-      dts({tsconfig: './tsconfig.json'}),
+      dts(),
     ],
   },
 ]

@@ -9,8 +9,15 @@ export enum DropdownSize {
     'full' = '100',
 }
 
+export type DropdownAnimationProps = {
+    animate: boolean;
+    animateChildren?: boolean;
+    delayPerChild?: 0.1 | 0.2 | 0.3 | 0.4 | 0.5;
+}
+
 export interface SimpleDropdownProps<T> {
     title: string;
+    animation?: DropdownAnimationProps;
     selected: T | null;
     items: T[];
     onSelect: (item: T) => void;
