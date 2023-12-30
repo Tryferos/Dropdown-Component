@@ -24,7 +24,7 @@ type ExtraProps<T> = {
 export type CategorizedDropdownProps<T> = DropdownProps & ExtraProps<T>;
 
 export function CategorizedDropdown<T extends ReactNode & {}>(props: CategorizedDropdownProps<T>) {
-    const { title, selected, onSelect, openByDefault, animation } = props;
+    const { title, selected, openByDefault, animation } = props;
     const { categories } = props;
     const [isOpen, setIsOpen] = useState(openByDefault || false);
     const [renderedItems, setItems] = useState(props.categories);
@@ -49,14 +49,22 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: Categorized
         setIsOpen(true);
     }
     const maxHeight = props.maxHeight || '250px';
+
+    const closeOnSelect = props.closeOnSelect ?? false;
+
+    const onSelect = (item: SelectProps<T>) => {
+        props.onSelect(item);
+        if (!closeOnSelect || (item.category.title == selected.category.title && item.item == selected.item)) return;
+        setIsOpen(false);
+    }
     return (
-        <DropdownWrapper closeOnClickOutside={props.closeOnClickOutside} queryItems={queryItems} search={props.search} rounded={props.rounded} shadow={props.shadow} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth}
+        <DropdownWrapper placeholder={props.placeholder} onSearchChange={props.onSearchChange} closeOnClickOutside={props.closeOnClickOutside} queryItems={queryItems} search={props.search} rounded={props.rounded} shadow={props.shadow} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth}
             title={title} selected={selected.item} size={props.size}
             onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed} >
             <AnimatePresence>
                 {
                     isOpen &&
-                    <DropdownItems maxHeight={maxHeight} animation={animation} categories={renderedItems} onSelect={props.onSelect} selected={props.selected} />
+                    <DropdownItems maxHeight={maxHeight} animation={animation} categories={renderedItems} onSelect={onSelect} selected={props.selected} />
                 }
             </AnimatePresence>
         </DropdownWrapper>

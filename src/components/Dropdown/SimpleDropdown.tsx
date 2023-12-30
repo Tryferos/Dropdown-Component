@@ -16,7 +16,7 @@ type ExtraProps<T> = {
 type SimpleDropdownProps<T> = DropdownProps & ExtraProps<T>;
 
 export function SimpleDropdown<T extends ReactNode & {}>(props: SimpleDropdownProps<T>) {
-    const { title, selected, items, onSelect, openByDefault, animation } = props;
+    const { title, selected, items, openByDefault, animation } = props;
 
     const [isOpen, setIsOpen] = useState(openByDefault || false);
     const [selectedItem, setSelected] = useState<T>(props.selected);
@@ -33,6 +33,14 @@ export function SimpleDropdown<T extends ReactNode & {}>(props: SimpleDropdownPr
         setIsOpen(true);
     }
 
+    const closeOnSelect = props.closeOnSelect ?? false;
+
+    const onSelect = (item: T) => {
+        props.onSelect(item);
+        if (!closeOnSelect || item == selected) return;
+        setIsOpen(false);
+    }
+
     const maxHeight = props.maxHeight || '250px';
 
     const handleOpen = (forceOpen?: boolean) => setIsOpen(forceOpen ?? !isOpen);
@@ -40,7 +48,7 @@ export function SimpleDropdown<T extends ReactNode & {}>(props: SimpleDropdownPr
     useEffect(() => {
     }, [])
     return (
-        <DropdownWrapper closeOnClickOutside={props.closeOnClickOutside} queryItems={queryItems} search={props.search} shadow={props.shadow} rounded={props.rounded} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth} title={title} selected={selected} size={props.size} onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed}>
+        <DropdownWrapper placeholder={props.placeholder} onSearchChange={props.onSearchChange} closeOnClickOutside={props.closeOnClickOutside} queryItems={queryItems} search={props.search} shadow={props.shadow} rounded={props.rounded} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth} title={title} selected={selected} size={props.size} onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed}>
             <AnimatePresence>
                 {isOpen &&
                     <DropdownItems maxHeight={maxHeight} items={renderedItems} selected={selectedItem} onSelect={onSelect} animation={animation} />
@@ -59,6 +67,7 @@ function DropdownItems<T>(props: Pick<SimpleDropdownProps<T>, 'items' | 'selecte
     const ref = React.useRef<HTMLUListElement>(null);
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
     const [canRenderMore, setCanRenderMore] = useState(false);
+
     useEffect(() => {
         if (ref.current == null || !ref) return;
         ref.current.style.maxHeight = `calc(0px + ${props.maxHeight})`;
@@ -119,7 +128,7 @@ function DropdownItems<T>(props: Pick<SimpleDropdownProps<T>, 'items' | 'selecte
 
 export function DropdownWrapper<T>(
     props:
-        Pick<SimpleDropdownProps<T>, 'closeOnClickOutside'
+        Pick<SimpleDropdownProps<T>, 'closeOnClickOutside' | 'onSearchChange' | 'placeholder'
             | 'search' | 'title' | 'size' | 'selected' | 'showTitleIfClosed' | 'maxWidth' | 'minWidth' | 'darkMode' | 'rounded' | 'shadow'> &
         { children: ReactNode; onOpen: (forceOpen?: boolean) => void; isOpen: boolean; queryItems: (query: string) => void; }) {
 
@@ -138,7 +147,9 @@ export function DropdownWrapper<T>(
     const [query, setQuery] = useState<string>(props.selected as string ?? '');
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setQuery(e.target.value);
+        const value = e.target.value;
+        setQuery(value);
+        props.onSearchChange && props.onSearchChange(value);
     };
 
     const onClick = (e: React.MouseEvent<HTMLInputElement>) => {
@@ -184,13 +195,16 @@ export function DropdownWrapper<T>(
         parentRef.current.setAttribute('class', 'dark')
     }, [darkMode, parentRef])
 
+    const placeholder = props.placeholder ?? 'Search for an item'
+
     return (
         <section ref={parentRef}>
             <div ref={ref} className={`${rounded ? 'rounded' : 'rounded-none'} dark:rounded outline ml-10 mt-10 dark:outline-white dark:text-white ${shadow ? 'shadow-outline dark:shadow-outline-dark' : 'shadow-none'} transition-all outline-black w-[25%] outline-2 min-w-[125px] min-h-md`}>
                 <div onClick={() => props.onOpen()} className={`h-[10%] px-2 text-lg flex dark:bg-slate-800 dark:text-white justify-between py-2 ${isOpen ? 'border-b-2' : 'border-b-none'} dark:border-b-gray-300 border-b-gray-600 cursor-pointer`}>
                     {
                         search ?
-                            <input onClick={onClick} onChange={onChange} type='text' value={query} className='w-[80%] bg-transparent outline-none font-medium select-none first-letter:uppercase' />
+                            <input placeholder={placeholder} onClick={onClick} onChange={onChange} type='text' value={query}
+                                className='w-[80%] placeholder:font-normal bg-transparent outline-none font-medium select-none first-letter:uppercase' />
                             : <p className='font-medium select-none first-letter:uppercase'>{title as ReactNode}</p>
                     }
                     <Arrow isOpen={isOpen} />
