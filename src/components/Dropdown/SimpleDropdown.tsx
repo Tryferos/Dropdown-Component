@@ -86,7 +86,8 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
             animate={{ height: 'auto' }}
             exit={{ height: 0, transition: { duration: animate ? offset : 0 } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
-            className='*:border-b-[1px] *:border-b-gray-200 *:dark:border-b-gray-600 dark:bg-slate-800 *:cursor-pointer scrollbar dark:scrollbardark'>
+            className='*:border-b-[1px] *:border-b-gray-200 *:dark:border-b-gray-600 dark:bg-slate-800 *:cursor-pointer scrollbar dark:scrollbar-dark
+             data-[mode=selected]:*:bg-gray-200 data-[mode=selected]:*:dark:bg-slate-700'>
             {
                 items.map((item, index) => {
                     const delay = animateChildren ? (offset * Math.min(index, ANIMATION_STOP)) : offset;
@@ -94,11 +95,13 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
                         (!canRenderMore && index > ANIMATION_STOP) ? null :
                             <AnimationListItem
                                 key={index}
+                                selected={selected == item}
+                                disabled={false}
                                 animate={animate}
                                 delay={delay}
                                 index={index}
                                 onClick={() => onSelect(item)}
-                                className={`hover:bg-gray-100 dark:hover:bg-slate-700 ${(selected == item) ? 'bg-gray-200 dark:bg-slate-700' : ''}`}
+                                className={`hover:bg-gray-200 dark:hover:bg-slate-700`}
                             >
                                 <p className='px-2 py-1 first-letter:uppercase dark:text-white select-none'>{item as ReactNode}</p>
                             </AnimationListItem>

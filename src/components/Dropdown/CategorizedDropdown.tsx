@@ -32,7 +32,7 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: DropdownPro
     const handleOpen = () => setIsOpen(!isOpen);
     const maxHeight = props.maxHeight || '250px';
     return (
-        <DropdownWrapper maxWidth={props.maxWidth} minWidth={props.minWidth}
+        <DropdownWrapper rounded={props.rounded} shadow={props.shadow} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth}
             title={title} selected={selected.item} size={props.size}
             onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed} >
             <AnimatePresence>
@@ -74,7 +74,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
             animate={{ height: 'auto' }}
             exit={{ height: 0, transition: { duration: animate ? offset : 0 } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
-            className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200 scrollbar'>
+            className='*:select-none *:border-b-[1px] data-[mode=selected]:*:bg-gray-200 data-[mode=selected]:*:dark:bg-slate-700 data-[mode=disabled]:*:text-gray-600 data-[mode=disabled]:*:dark:text-gray-500 data-[mode=disabled]:*:cursor-not-allowed *:flex *:items-center *:border-b-gray-200 dark:*:border-b-gray-600 dark:scrollbar-dark scrollbar dark:bg-slate-800 bg-white'>
             {
                 categories.map((category, vIndex) => {
                     const currentTotalItems = categories.slice(0, vIndex + 1).reduce((prev, cur, i) => prev + cur.items.length + 1, 0);
@@ -84,9 +84,11 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
                             <AnimationListItem
                                 animate={animate}
                                 delay={delay}
+                                disabled={false}
+                                selected={false}
                                 index={vIndex}
                                 onClick={() => { }}
-                                className=' text-gray-600 text-lg '>
+                                className=' text-gray-600 text-lg dark:bg-slate-800 dark:text-gray-200'>
                                 <p className='px-2 py-1 first-letter:uppercase select-none'>
                                     {category.title as ReactNode}
                                 </p>
@@ -94,19 +96,20 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
                             {
                                 category.items.map((item, index) => {
                                     const addedDelay = animateChildren ? (delay + offset * Math.min(index + vIndex, ANIMATION_STOP)) : offset;
+                                    const isSelected = props.selected.category.title == category.title && props.selected.item == item.item;
                                     return ((!canRenderMore && ((currentTotalItems - category.items.length) + index) > ANIMATION_STOP) ? null :
                                         <AnimationListItem
                                             key={vIndex + "-" + index}
                                             animate={animate}
+                                            selected={isSelected}
+                                            disabled={item.disabled}
                                             delay={addedDelay}
                                             index={index}
                                             onClick={() =>
-                                                item.disabled != true &&
                                                 props.onSelect({ item: item.item, category: { title: category.title } })}
-                                            className={` ${props.selected.category.title == category.title && props.selected.item == item.item && 'bg-gray-200'}
-                                            ${item.disabled == true ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer'} `}
+                                            className={`hover:bg-gray-100 dark:hover:bg-slate-700 data-[mode=disabled]:hover:bg-slate-800 cursor-pointer`}
                                         >
-                                            <div className={`w-[6px] ml-3 h-[6px] rounded-full bg-slate-500`}></div>
+                                            <div className={`w-[6px] ml-3 h-[6px] rounded-full bg-slate-500 dark:bg-slate-300`}></div>
                                             <p className='px-2 py-1 first-letter:uppercase select-none'>
                                                 {item.item as ReactNode}
                                             </p>
@@ -126,7 +129,9 @@ export const AnimationListItem: FC<
     {
         index: number;
         delay: number;
-        animate: boolean
+        animate: boolean;
+        disabled?: boolean;
+        selected: boolean
         className: string;
         onClick: () => void;
         children: ReactNode;
@@ -134,11 +139,14 @@ export const AnimationListItem: FC<
 >
     = (props) => {
 
-        const { index, delay, animate, className, onClick, children } = props;
+        const { index, delay, animate, className, onClick, children, selected } = props;
+
+        const disabled = props.disabled ?? false;
 
         return (
             <motion.li
-                onClick={onClick}
+                data-mode={disabled ? 'disabled' : selected ? 'selected' : 'normal'}
+                onClick={!disabled ? onClick : () => { }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0, transition: { duration: 0 } }}
