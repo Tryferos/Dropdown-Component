@@ -27,16 +27,33 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: Categorized
     const { title, selected, onSelect, openByDefault, animation } = props;
     const { categories } = props;
     const [isOpen, setIsOpen] = useState(openByDefault || false);
+    const [renderedItems, setItems] = useState(props.categories);
     const handleOpen = () => setIsOpen(!isOpen);
+    const queryItems = (query: string) => {
+        //Filter categories containing query in both title or items
+        const filteredItems = categories.filter(category =>
+            category.title.toLowerCase().includes(query.toLowerCase()) ||
+            category.items.some(item => item.item.toString().toLowerCase().includes(query.toLowerCase())));
+        //Filter items in each category containing query
+        const mappedItems = filteredItems.map(category => {
+            const filteredItems = category.items.filter(item => item.item.toString().toLowerCase().includes(query.toLowerCase()));
+            return {
+                title: category.title,
+                items: filteredItems.length == 0 ? category.items : filteredItems, //Show all items if none found
+            }
+        });
+        setItems(mappedItems);
+        setIsOpen(true);
+    }
     const maxHeight = props.maxHeight || '250px';
     return (
-        <DropdownWrapper rounded={props.rounded} shadow={props.shadow} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth}
+        <DropdownWrapper queryItems={queryItems} search={props.search} rounded={props.rounded} shadow={props.shadow} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth}
             title={title} selected={selected.item} size={props.size}
             onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed} >
             <AnimatePresence>
                 {
                     isOpen &&
-                    <DropdownItems maxHeight={maxHeight} animation={animation} categories={categories} onSelect={props.onSelect} selected={props.selected} />
+                    <DropdownItems maxHeight={maxHeight} animation={animation} categories={renderedItems} onSelect={props.onSelect} selected={props.selected} />
                 }
             </AnimatePresence>
         </DropdownWrapper>
@@ -44,8 +61,7 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: Categorized
 }
 
 
-function DropdownItems<T>(props: Pick<CategorizedDropdownProps<T>, 'categories' | 'animation' | 'maxHeight'>
-    & ExtraProps<T>) {
+function DropdownItems<T>(props: Pick<CategorizedDropdownProps<T>, 'categories' | 'animation' | 'maxHeight' | 'onSelect' | 'selected'>) {
     const { categories, animation } = props;
     const animate = animation?.animate ?? true;
     const animateChildren = (animate && animation?.animateChildren) ?? true;
@@ -72,52 +88,67 @@ function DropdownItems<T>(props: Pick<CategorizedDropdownProps<T>, 'categories' 
             animate={{ height: 'auto' }}
             exit={{ height: 0, transition: { duration: animate ? offset : 0 } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
-            className='*:select-none *:border-b-[1px] data-[mode=selected]:*:bg-gray-200 data-[mode=selected]:*:dark:bg-slate-700 data-[mode=disabled]:*:text-gray-600 data-[mode=disabled]:*:dark:text-gray-500 data-[mode=disabled]:*:cursor-not-allowed *:flex *:items-center *:border-b-gray-200 dark:*:border-b-gray-600 dark:scrollbar-dark scrollbar dark:bg-slate-800 bg-white'>
+            className='*:select-none *:border-b-[1px] data-[mode=selected]:*:bg-gray-200 data-[mode=selected]:*:dark:bg-slate-700 data-[mode=disabled]:*:text-gray-600 data-[mode=disabled]:*:dark:text-gray-400 data-[mode=disabled]:*:cursor-not-allowed *:flex *:items-center *:border-b-gray-200 dark:*:border-b-gray-600 dark:scrollbar-dark scrollbar dark:bg-slate-800 bg-white'>
             {
-                categories.map((category, vIndex) => {
-                    const currentTotalItems = categories.slice(0, vIndex + 1).reduce((prev, cur, i) => prev + cur.items.length + 1, 0);
-                    const delay = animateChildren ? ((Math.min(categories[vIndex - 1]?.items.length || 0, 4)) * offset + 0.2) : offset
-                    return (
-                        <Fragment key={vIndex}>
-                            <AnimationListItem
-                                animate={animate}
-                                delay={delay}
-                                disabled={false}
-                                selected={false}
-                                index={vIndex}
-                                onClick={() => { }}
-                                className=' text-gray-600 text-lg dark:bg-slate-800 dark:text-gray-200'>
-                                <p className='px-2 py-1 first-letter:uppercase select-none'>
-                                    {category.title as ReactNode}
-                                </p>
-                            </AnimationListItem>
-                            {
-                                category.items.map((item, index) => {
-                                    const addedDelay = animateChildren ? (delay + offset * Math.min(index + vIndex, ANIMATION_STOP)) : offset;
-                                    const isSelected = props.selected.category.title == category.title && props.selected.item == item.item;
-                                    return ((!canRenderMore && ((currentTotalItems - category.items.length) + index) > ANIMATION_STOP) ? null :
-                                        <AnimationListItem
-                                            key={vIndex + "-" + index}
-                                            animate={animate}
-                                            selected={isSelected}
-                                            disabled={item.disabled}
-                                            delay={addedDelay}
-                                            index={index}
-                                            onClick={() =>
-                                                props.onSelect({ item: item.item, category: { title: category.title } })}
-                                            className={`hover:bg-gray-100 dark:hover:bg-slate-700 data-[mode=disabled]:hover:bg-slate-800 cursor-pointer`}
-                                        >
-                                            <div className={`w-[6px] ml-3 h-[6px] rounded-full bg-slate-500 dark:bg-slate-300`}></div>
-                                            <p className='px-2 py-1 first-letter:uppercase select-none'>
-                                                {item.item as ReactNode}
-                                            </p>
-                                        </AnimationListItem>
-                                    )
-                                })
-                            }
-                        </Fragment>
-                    )
-                })
+                categories.length == 0 ?
+                    <AnimationListItem
+                        animate={animate}
+                        delay={offset}
+                        disabled={true}
+                        selected={false}
+                        index={0}
+                        onClick={() => { }}
+                        className='text-gray-600 text-lg dark:bg-slate-800 dark:text-gray-200'
+                    >
+                        <p className='px-2 py-1 first-letter:uppercase select-none'>
+                            No items found
+                        </p>
+                    </AnimationListItem>
+                    :
+                    categories.map((category, vIndex) => {
+                        const currentTotalItems = categories.slice(0, vIndex + 1).reduce((prev, cur, i) => prev + cur.items.length + 1, 0);
+                        const delay = animateChildren ? ((Math.min(categories[vIndex - 1]?.items.length || 0, 4)) * offset + 0.2) : offset
+                        return (
+                            <Fragment key={vIndex}>
+                                <AnimationListItem
+                                    animate={animate}
+                                    delay={delay}
+                                    disabled={false}
+                                    selected={false}
+                                    index={vIndex}
+                                    onClick={() => { }}
+                                    className=' text-gray-600 text-lg dark:bg-slate-800 dark:text-gray-200'>
+                                    <p className='px-2 py-1 first-letter:uppercase select-none'>
+                                        {category.title as ReactNode}
+                                    </p>
+                                </AnimationListItem>
+                                {
+                                    category.items.map((item, index) => {
+                                        const addedDelay = animateChildren ? (delay + offset * Math.min(index + vIndex, ANIMATION_STOP)) : offset;
+                                        const isSelected = props.selected.category.title == category.title && props.selected.item == item.item;
+                                        return ((!canRenderMore && ((currentTotalItems - category.items.length) + index) > ANIMATION_STOP) ? null :
+                                            <AnimationListItem
+                                                key={vIndex + "-" + index}
+                                                animate={animate}
+                                                selected={isSelected}
+                                                disabled={item.disabled}
+                                                delay={addedDelay}
+                                                index={index}
+                                                onClick={() =>
+                                                    props.onSelect({ item: item.item, category: { title: category.title } })}
+                                                className={`hover:bg-gray-100 dark:hover:bg-slate-700 data-[mode=disabled]:hover:bg-slate-800 cursor-pointer`}
+                                            >
+                                                <div className={`w-[6px] ml-3 h-[6px] rounded-full bg-slate-500 dark:bg-slate-300`}></div>
+                                                <p className='px-2 py-1 first-letter:uppercase select-none'>
+                                                    {item.item as ReactNode}
+                                                </p>
+                                            </AnimationListItem>
+                                        )
+                                    })
+                                }
+                            </Fragment>
+                        )
+                    })
             }
         </motion.ul>
     )
@@ -143,6 +174,7 @@ export const AnimationListItem: FC<
 
         return (
             <motion.li
+                viewport={{ once: true }}
                 data-mode={disabled ? 'disabled' : selected ? 'selected' : 'normal'}
                 onClick={!disabled ? onClick : () => { }}
                 initial={{ opacity: 0 }}

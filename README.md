@@ -2,6 +2,8 @@
 
 [Install the package for npm here.](https://www.npmjs.com/package/@tryferos/dropdown)
 
+[Source code on Github.](https://github.com/Tryferos/Dropdown-Component)
+
 This is a **react component** delivering various **Editable Dropdowns** that you can use in your projects, which also adds **types** support using Typescript.
 
 The project is build using **React, Typescript and Tailwindcss**. Tailwindcss is compiled into css, meaning you do not need it as a depedency.

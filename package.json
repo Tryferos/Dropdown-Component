@@ -1,6 +1,6 @@
 {
   "name": "@tryferos/dropdown",
-  "version": "1.2.0",
+  "version": "1.2.3",
   "description": "Provides you with multiple dropdown components to use in your React app.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
