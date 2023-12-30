@@ -14,7 +14,7 @@ All files are bundled into 3 seperate files for both cjs, esm and dts using the 
 
 -   [x] Typescript support
 -   [x] Customizable to your needs
--   [ ] Light/dark mode toggle
+-   [x] Light/dark mode toggle
 
 ## Installation
 

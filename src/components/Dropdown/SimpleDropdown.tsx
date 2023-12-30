@@ -18,26 +18,30 @@ export type DropdownAnimationProps = {
     animateChildrenUntilIndex?: number;
 }
 
-export interface SimpleDropdownProps<T> {
-    title: string;
+export type DropdownProps = {
     animation?: DropdownAnimationProps;
-    selected: T | null;
-    maxHeight?: string;
+    size?: DropdownSize;
     minWidth?: string;
     maxWidth?: string;
+    maxHeight?: string;
     darkMode?: boolean;
     rounded?: boolean;
     shadow?: boolean;
-    items: T[];
-    onSelect: (item: T) => void;
-    size?: DropdownSize;
     openByDefault?: boolean;
     showTitleIfClosed?: boolean;
+    title: string;
 }
 
-type DropdownProps<T> = SimpleDropdownProps<T>;
+type ExtraProps<T> = {
+    items: T[];
+    onSelect: (item: T) => void;
+    selected: T;
+}
 
-export function SimpleDropdown<T extends ReactNode & {}>(props: DropdownProps<T>) {
+
+type SimpleDropdownProps<T> = DropdownProps & ExtraProps<T>;
+
+export function SimpleDropdown<T extends ReactNode & {}>(props: SimpleDropdownProps<T>) {
     const { title, selected, items, onSelect, openByDefault, animation } = props;
 
     const [isOpen, setIsOpen] = useState(openByDefault || false);
@@ -59,7 +63,7 @@ export function SimpleDropdown<T extends ReactNode & {}>(props: DropdownProps<T>
     )
 }
 
-function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | 'onSelect' | 'animation' | 'maxHeight'>) {
+function DropdownItems<T>(props: Pick<SimpleDropdownProps<T>, 'items' | 'selected' | 'onSelect' | 'animation' | 'maxHeight'>) {
     const { items, selected, onSelect, animation } = props;
     const animate = animation?.animate ?? true;
     const animateChildren = (animate && animation?.animateChildren) ?? true;
@@ -115,7 +119,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
 
 export function DropdownWrapper<T>(
     props:
-        Pick<DropdownProps<T>, 'title' | 'size' | 'selected' | 'showTitleIfClosed' | 'maxWidth' | 'minWidth' | 'darkMode' | 'rounded' | 'shadow'> &
+        Pick<SimpleDropdownProps<T>, 'title' | 'size' | 'selected' | 'showTitleIfClosed' | 'maxWidth' | 'minWidth' | 'darkMode' | 'rounded' | 'shadow'> &
         { children: ReactNode; onOpen: () => void; isOpen: boolean }) {
 
     const { title: vTitle, children, isOpen, selected } = props;

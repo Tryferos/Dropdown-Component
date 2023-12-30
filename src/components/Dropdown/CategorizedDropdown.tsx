@@ -1,4 +1,4 @@
-import { SimpleDropdownProps, DropdownWrapper } from "./SimpleDropdown";
+import { DropdownProps, DropdownWrapper } from "./SimpleDropdown";
 import React, { useState, useEffect, ReactNode, Fragment, lazy, FC } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -16,16 +16,13 @@ type onSelectProps<T> = (item: SelectProps<T>) => void
 
 type ExtraProps<T> = {
     onSelect: onSelectProps<T>;
-    selected: SelectProps<T>
+    selected: SelectProps<T>;
+    categories: Array<Category<T>>;
 }
 
-export type CategorizedDropdownProps<T> = {
-    categories: Array<Category<T>>;
-} & Omit<SimpleDropdownProps<T>, 'items' | 'onSelect' | 'selected'> & ExtraProps<T>;
+export type CategorizedDropdownProps<T> = DropdownProps & ExtraProps<T>;
 
-type DropdownProps<T> = CategorizedDropdownProps<T>;
-
-export function CategorizedDropdown<T extends ReactNode & {}>(props: DropdownProps<T>) {
+export function CategorizedDropdown<T extends ReactNode & {}>(props: CategorizedDropdownProps<T>) {
     const { title, selected, onSelect, openByDefault, animation } = props;
     const { categories } = props;
     const [isOpen, setIsOpen] = useState(openByDefault || false);
@@ -46,7 +43,7 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: DropdownPro
 }
 
 
-function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animation' | 'maxHeight'>
+function DropdownItems<T>(props: Pick<CategorizedDropdownProps<T>, 'categories' | 'animation' | 'maxHeight'>
     & ExtraProps<T>) {
     const { categories, animation } = props;
     const animate = animation?.animate ?? true;
