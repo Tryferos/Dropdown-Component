@@ -21,8 +21,10 @@ export type DropdownProps = {
     size?: DropdownSize;
     search?: boolean;
     closeOnClickOutside?: boolean;
-    minWidth?: string;
     placeholder?: string;
+    onSearchChange?: (value: string) => void;
+    closeOnSelect?: boolean;
+    minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;
     darkMode?: boolean;
@@ -30,7 +32,5 @@ export type DropdownProps = {
     shadow?: boolean;
     openByDefault?: boolean;
     showTitleIfClosed?: boolean;
-    onSearchChange?: (value: string) => void;
-    closeOnSelect?: boolean;
     title: string;
 }

@@ -13,28 +13,28 @@ All files are bundled into 3 seperate files for both cjs, esm and dts using the 
 ## :dart: Features
 
 -   :white_check_mark: Typescript support
--   :white_check_mark: Customizable to your needs
+-   :white_check_mark: **FULLY** Customizable to your needs
 -   :white_check_mark: Light/dark mode toggle
--   :hourglass: Add Search option
+-   :white_check_mark: Search option
 
 ## :electric_plug: Installation
 
 Install @tryferos/dropdown using
 
 ```bash
-  npm install @tryferos/dropdown@latest
+  npm install @tryferos/dropdown@1.3.2
 ```
 
 Remember that you need to have react and react-dom already installed
 
 ```bash
-  npm install react@^17.0.1 react-dom@^17.0.1
+  npm install react@^18.0.1 react-dom@^18.0.1
 ```
 
-This package is build using react 17, you can use with different versions of react at your responsibility.
+This package is build using react 18, you can use with different versions of react at your own responsibility.
 
 ```bash
-  npm install @tryferos/dropdown@latest --force
+  npm install @tryferos/dropdown@1.3.2 --force
 ```
 
 Import the components
@@ -62,6 +62,11 @@ import { SimpleDropdown, CategorizedDropdown } from "@tryferos/dropdown";
     size?: string; //in percentage without %
     openByDefault?: boolean;
     showTitleIfClosed?: boolean;
+    search?: boolean;
+    closeOnClickOutside?: boolean;
+    placeholder?: string;
+    onSearchChange?: (value: string) => void;
+    closeOnSelect?: boolean;
     //For Simple Dropdowns
     items: Array<T>;
     onSelect: (item: T) => void;
