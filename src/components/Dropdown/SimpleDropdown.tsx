@@ -3,37 +3,11 @@ import '../../tailwind.css'
 import { Arrow } from '../../svg';
 import { AnimatePresence, motion } from 'framer-motion'
 import { AnimationListItem } from './CategorizedDropdown';
+import { DropdownProps, DropdownSize } from '.';
 
-export enum DropdownSize {
-    'sm' = '25',
-    'md' = '50',
-    'lg' = '75',
-    'full' = '100',
-}
-
-export type DropdownAnimationProps = {
-    animate?: boolean;
-    animateChildren?: boolean;
-    delayPerChild?: 0.1 | 0.2 | 0.3 | 0.4 | 0.5;
-    animateChildrenUntilIndex?: number;
-}
-
-export type DropdownProps = {
-    animation?: DropdownAnimationProps;
-    size?: DropdownSize;
-    minWidth?: string;
-    maxWidth?: string;
-    maxHeight?: string;
-    darkMode?: boolean;
-    rounded?: boolean;
-    shadow?: boolean;
-    openByDefault?: boolean;
-    showTitleIfClosed?: boolean;
-    title: string;
-}
 
 type ExtraProps<T> = {
-    items: T[];
+    items: Array<T>;
     onSelect: (item: T) => void;
     selected: T;
 }

@@ -1,4 +1,5 @@
-import { DropdownProps, DropdownWrapper } from "./SimpleDropdown";
+import { DropdownWrapper } from "./SimpleDropdown";
+import { DropdownProps } from ".";
 import React, { useState, useEffect, ReactNode, Fragment, lazy, FC } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
