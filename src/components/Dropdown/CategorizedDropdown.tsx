@@ -59,7 +59,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
         setTimeout(() => {
             //* fix showing scrollbar for a small time period when not needed
             if (ref.current == null || !ref) return;
-            ref.current.style.overflowY = 'auto';
+            // ref.current.style.overflowY = 'auto';
         }, 201)
     }, [ref, props.maxHeight])
     return (
@@ -69,7 +69,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
             animate={{ height: 'auto' }}
             exit={{ height: 0, transition: { duration: animate ? offset : 0 } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
-            className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200 scrollbar'>
+            className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200 scrollbar overflow-y-auto'>
             {
                 categories.map((category, vIndex) => {
                     const delay = animateChildren ? ((Math.min(categories[vIndex - 1]?.items.length || 0, 4)) * offset + 0.2) : offset

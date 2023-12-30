@@ -41,6 +41,7 @@ export default [
       resolve(),
       external(),
       typescript(),
+      terser(),
     ],
   },
   { //TYPESCRIPT
