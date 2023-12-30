@@ -15,6 +15,7 @@ export type DropdownAnimationProps = {
     animate?: boolean;
     animateChildren?: boolean;
     delayPerChild?: 0.1 | 0.2 | 0.3 | 0.4 | 0.5;
+    animateChildrenUntilIndex?: number;
 }
 
 export interface SimpleDropdownProps<T> {
@@ -63,6 +64,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
     const animate = animation?.animate ?? true;
     const animateChildren = (animate && animation?.animateChildren) ?? true;
     const offset = (animation?.delayPerChild || 0.2)
+    const ANIMATION_STOP = animation?.animateChildrenUntilIndex ?? 10;
     const ref = React.useRef<HTMLUListElement>(null);
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
     const [canRenderMore, setCanRenderMore] = useState(false);
@@ -77,7 +79,6 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
             setCanRenderMore(true);
         }, 201)
     }, [props.maxHeight, ref, timeoutRef])
-    console.log(canRenderMore)
     return (
         <motion.ul
             ref={ref}
@@ -88,9 +89,9 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
             className='*:border-b-[1px] *:border-b-gray-200 *:dark:border-b-gray-600 dark:bg-slate-800 *:cursor-pointer scrollbar dark:scrollbardark'>
             {
                 items.map((item, index) => {
-                    const delay = animateChildren ? (offset * Math.min(index, 10)) : offset;
+                    const delay = animateChildren ? (offset * Math.min(index, ANIMATION_STOP)) : offset;
                     return (
-                        (!canRenderMore && index > 10) ? null :
+                        (!canRenderMore && index > ANIMATION_STOP) ? null :
                             <AnimationListItem
                                 key={index}
                                 animate={animate}

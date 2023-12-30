@@ -51,6 +51,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
     const { categories, animation } = props;
     const animate = animation?.animate ?? true;
     const animateChildren = (animate && animation?.animateChildren) ?? true;
+    const ANIMATION_STOP = animation?.animateChildrenUntilIndex ?? 10;
     const offset = (animation?.delayPerChild || 0.2)
     const ref = React.useRef<HTMLUListElement>(null);
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -76,6 +77,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
             className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200 scrollbar'>
             {
                 categories.map((category, vIndex) => {
+                    const currentTotalItems = categories.slice(0, vIndex + 1).reduce((prev, cur, i) => prev + cur.items.length + 1, 0);
                     const delay = animateChildren ? ((Math.min(categories[vIndex - 1]?.items.length || 0, 4)) * offset + 0.2) : offset
                     return (
                         <Fragment key={vIndex}>
@@ -89,10 +91,10 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
                                     {category.title as ReactNode}
                                 </p>
                             </AnimationListItem>
-                            {(!canRenderMore) ? null :
+                            {
                                 category.items.map((item, index) => {
-                                    const addedDelay = animateChildren ? (delay + offset * Math.min(index + vIndex, 10)) : offset;
-                                    return (
+                                    const addedDelay = animateChildren ? (delay + offset * Math.min(index + vIndex, ANIMATION_STOP)) : offset;
+                                    return ((!canRenderMore && ((currentTotalItems - category.items.length) + index) > ANIMATION_STOP) ? null :
                                         <AnimationListItem
                                             key={vIndex + "-" + index}
                                             animate={animate}
