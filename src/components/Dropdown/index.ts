@@ -20,6 +20,7 @@ export type DropdownProps = {
     animation?: DropdownAnimationProps;
     size?: DropdownSize;
     search?: boolean;
+    closeOnClickOutside?: boolean;
     minWidth?: string;
     maxWidth?: string;
     maxHeight?: string;

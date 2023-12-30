@@ -28,7 +28,7 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: Categorized
     const { categories } = props;
     const [isOpen, setIsOpen] = useState(openByDefault || false);
     const [renderedItems, setItems] = useState(props.categories);
-    const handleOpen = () => setIsOpen(!isOpen);
+    const handleOpen = (forceOpen?: boolean) => setIsOpen(forceOpen ?? !isOpen);
     const queryItems = (query: string) => {
         //Filter categories containing query in both title or items
         const filteredItems = categories.filter(category =>
@@ -43,11 +43,14 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: Categorized
             }
         });
         setItems(mappedItems);
+
+        //*Check if it is the first render so we don't interfere with openByDefault option
+        if (renderedItems == props.categories) return;
         setIsOpen(true);
     }
     const maxHeight = props.maxHeight || '250px';
     return (
-        <DropdownWrapper queryItems={queryItems} search={props.search} rounded={props.rounded} shadow={props.shadow} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth}
+        <DropdownWrapper closeOnClickOutside={props.closeOnClickOutside} queryItems={queryItems} search={props.search} rounded={props.rounded} shadow={props.shadow} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth}
             title={title} selected={selected.item} size={props.size}
             onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed} >
             <AnimatePresence>

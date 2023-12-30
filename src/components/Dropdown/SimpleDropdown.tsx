@@ -27,17 +27,20 @@ export function SimpleDropdown<T extends ReactNode & {}>(props: SimpleDropdownPr
         setSelected(query as T);
         const filteredItems = items.filter(item => item.toString().toLowerCase().includes(query.toLowerCase()));
         setItems(filteredItems);
+
+        //*Check if it is the first render so we don't interfere with openByDefault option
+        if (selected == query) return;
         setIsOpen(true);
     }
 
     const maxHeight = props.maxHeight || '250px';
 
-    const handleOpen = () => setIsOpen(!isOpen);
+    const handleOpen = (forceOpen?: boolean) => setIsOpen(forceOpen ?? !isOpen);
 
     useEffect(() => {
     }, [])
     return (
-        <DropdownWrapper queryItems={queryItems} search={props.search} shadow={props.shadow} rounded={props.rounded} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth} title={title} selected={selected} size={props.size} onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed}>
+        <DropdownWrapper closeOnClickOutside={props.closeOnClickOutside} queryItems={queryItems} search={props.search} shadow={props.shadow} rounded={props.rounded} darkMode={props.darkMode} maxWidth={props.maxWidth} minWidth={props.minWidth} title={title} selected={selected} size={props.size} onOpen={handleOpen} isOpen={isOpen} showTitleIfClosed={props.showTitleIfClosed}>
             <AnimatePresence>
                 {isOpen &&
                     <DropdownItems maxHeight={maxHeight} items={renderedItems} selected={selectedItem} onSelect={onSelect} animation={animation} />
@@ -116,8 +119,9 @@ function DropdownItems<T>(props: Pick<SimpleDropdownProps<T>, 'items' | 'selecte
 
 export function DropdownWrapper<T>(
     props:
-        Pick<SimpleDropdownProps<T>, | 'search' | 'title' | 'size' | 'selected' | 'showTitleIfClosed' | 'maxWidth' | 'minWidth' | 'darkMode' | 'rounded' | 'shadow'> &
-        { children: ReactNode; onOpen: () => void; isOpen: boolean; queryItems: (query: string) => void; }) {
+        Pick<SimpleDropdownProps<T>, 'closeOnClickOutside'
+            | 'search' | 'title' | 'size' | 'selected' | 'showTitleIfClosed' | 'maxWidth' | 'minWidth' | 'darkMode' | 'rounded' | 'shadow'> &
+        { children: ReactNode; onOpen: (forceOpen?: boolean) => void; isOpen: boolean; queryItems: (query: string) => void; }) {
 
     const { title: vTitle, children, isOpen, selected } = props;
 
@@ -129,6 +133,7 @@ export function DropdownWrapper<T>(
     const rounded = props.rounded ?? true;
     const shadow = props.shadow ?? true;
     const search = props.search ?? false;
+    const closeOnClickOutside = props.closeOnClickOutside ?? true;
 
     const [query, setQuery] = useState<string>(props.selected as string ?? '');
 
@@ -140,6 +145,23 @@ export function DropdownWrapper<T>(
         e.preventDefault();
         e.stopPropagation();
     }
+
+    useEffect(() => {
+
+        const handleClickOutside = (e: MouseEvent) => {
+            if (ref.current == null || !ref) return;
+            if (ref.current.contains(e.target as Node)) return;
+            props.onOpen(false);
+        }
+
+        if (closeOnClickOutside) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            }
+        }
+
+    }, [closeOnClickOutside])
 
     useEffect(() => {
         if (!search) return;
@@ -165,7 +187,7 @@ export function DropdownWrapper<T>(
     return (
         <section ref={parentRef}>
             <div ref={ref} className={`${rounded ? 'rounded' : 'rounded-none'} dark:rounded outline ml-10 mt-10 dark:outline-white dark:text-white ${shadow ? 'shadow-outline dark:shadow-outline-dark' : 'shadow-none'} transition-all outline-black w-[25%] outline-2 min-w-[125px] min-h-md`}>
-                <div onClick={props.onOpen} className={`h-[10%] px-2 text-lg flex dark:bg-slate-800 dark:text-white justify-between py-2 ${isOpen ? 'border-b-2' : 'border-b-none'} dark:border-b-gray-300 border-b-gray-600 cursor-pointer`}>
+                <div onClick={() => props.onOpen()} className={`h-[10%] px-2 text-lg flex dark:bg-slate-800 dark:text-white justify-between py-2 ${isOpen ? 'border-b-2' : 'border-b-none'} dark:border-b-gray-300 border-b-gray-600 cursor-pointer`}>
                     {
                         search ?
                             <input onClick={onClick} onChange={onChange} type='text' value={query} className='w-[80%] bg-transparent outline-none font-medium select-none first-letter:uppercase' />
