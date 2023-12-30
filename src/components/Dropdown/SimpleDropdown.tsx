@@ -64,15 +64,20 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
     const animateChildren = (animate && animation?.animateChildren) ?? true;
     const offset = (animation?.delayPerChild || 0.2)
     const ref = React.useRef<HTMLUListElement>(null);
+    const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+    const [canRenderMore, setCanRenderMore] = useState(false);
     useEffect(() => {
         if (ref.current == null || !ref) return;
         ref.current.style.maxHeight = `calc(0px + ${props.maxHeight})`;
-        setTimeout(() => {
+        timeoutRef.current && clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
             //* fix showing scrollbar for a small time period when not needed
             if (ref.current == null || !ref) return;
             ref.current.style.overflowY = 'auto';
+            setCanRenderMore(true);
         }, 201)
-    }, [props.maxHeight, ref])
+    }, [props.maxHeight, ref, timeoutRef])
+    console.log(canRenderMore)
     return (
         <motion.ul
             ref={ref}
@@ -85,16 +90,17 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'items' | 'selected' | '
                 items.map((item, index) => {
                     const delay = animateChildren ? (offset * Math.min(index, 10)) : offset;
                     return (
-                        <AnimationListItem
-                            key={index}
-                            animate={animate}
-                            delay={delay}
-                            index={index}
-                            onClick={() => onSelect(item)}
-                            className={`hover:bg-gray-100 dark:hover:bg-slate-700 ${(selected == item) ? 'bg-gray-200 dark:bg-slate-700' : ''}`}
-                        >
-                            <p className='px-2 py-1 first-letter:uppercase dark:text-white select-none'>{item as ReactNode}</p>
-                        </AnimationListItem>
+                        (!canRenderMore && index > 10) ? null :
+                            <AnimationListItem
+                                key={index}
+                                animate={animate}
+                                delay={delay}
+                                index={index}
+                                onClick={() => onSelect(item)}
+                                className={`hover:bg-gray-100 dark:hover:bg-slate-700 ${(selected == item) ? 'bg-gray-200 dark:bg-slate-700' : ''}`}
+                            >
+                                <p className='px-2 py-1 first-letter:uppercase dark:text-white select-none'>{item as ReactNode}</p>
+                            </AnimationListItem>
                     )
                 })
             }

@@ -53,15 +53,19 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
     const animateChildren = (animate && animation?.animateChildren) ?? true;
     const offset = (animation?.delayPerChild || 0.2)
     const ref = React.useRef<HTMLUListElement>(null);
+    const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+    const [canRenderMore, setCanRenderMore] = useState(false);
     useEffect(() => {
         if (ref.current == null || !ref) return;
-        ref.current.style.maxHeight = props.maxHeight || '250px';
-        setTimeout(() => {
+        ref.current.style.maxHeight = `calc(0px + ${props.maxHeight})`;
+        timeoutRef.current && clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
             //* fix showing scrollbar for a small time period when not needed
             if (ref.current == null || !ref) return;
-            // ref.current.style.overflowY = 'auto';
+            ref.current.style.overflowY = 'auto';
+            setCanRenderMore(true);
         }, 201)
-    }, [ref, props.maxHeight])
+    }, [props.maxHeight, ref, timeoutRef])
     return (
         <motion.ul
             ref={ref}
@@ -69,7 +73,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
             animate={{ height: 'auto' }}
             exit={{ height: 0, transition: { duration: animate ? offset : 0 } }}
             transition={{ duration: animate ? offset : 0, ease: 'easeInOut' }}
-            className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200 scrollbar overflow-y-auto'>
+            className='*:select-none *:border-b-[1px] *:flex *:items-center *:border-b-gray-200 scrollbar'>
             {
                 categories.map((category, vIndex) => {
                     const delay = animateChildren ? ((Math.min(categories[vIndex - 1]?.items.length || 0, 4)) * offset + 0.2) : offset
@@ -85,7 +89,7 @@ function DropdownItems<T>(props: Pick<DropdownProps<T>, 'categories' | 'animatio
                                     {category.title as ReactNode}
                                 </p>
                             </AnimationListItem>
-                            {
+                            {(!canRenderMore) ? null :
                                 category.items.map((item, index) => {
                                     const addedDelay = animateChildren ? (delay + offset * Math.min(index + vIndex, 10)) : offset;
                                     return (
