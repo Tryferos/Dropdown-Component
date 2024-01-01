@@ -24,6 +24,7 @@ export function SimpleDropdown<T extends ReactNode & {}>(props: SimpleDropdownPr
     const [renderedItems, setItems] = useState(props.items);
 
     const queryItems = (query: string) => {
+        if (selected == query) return;
         setSelected(query as T);
         const filteredItems = items.filter(item => item.toString().toLowerCase().includes(query.toLowerCase()));
         setItems(filteredItems);
@@ -156,6 +157,10 @@ export function DropdownWrapper<T>(
         e.preventDefault();
         e.stopPropagation();
     }
+
+    useEffect(() => {
+        setQuery(props.selected as string ?? '');
+    }, [props.selected])
 
     useEffect(() => {
 
