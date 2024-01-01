@@ -16,8 +16,11 @@ All files are bundled into 3 seperate files for both cjs, esm and dts using the 
 -   :white_check_mark: **FULLY** Customizable to your needs
 -   :white_check_mark: Light/dark mode toggle
 -   :white_check_mark: Search option
+-   :white_check_mark: Animations option
 
 ## :electric_plug: Installation
+
+##
 
 Install @tryferos/dropdown using
 
@@ -31,7 +34,7 @@ Remember that you need to have react and react-dom already installed
   npm install react@^18.0.1 react-dom@^18.0.1
 ```
 
-This package is build using react 18, you can use with different versions of react at your own responsibility.
+This package is build using react 18, you can use with different versions of react at your own risk.
 
 ```bash
   npm install @tryferos/dropdown@1.3.2 --force

@@ -1,10 +1,14 @@
 {
   "name": "@tryferos/dropdown",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Provides you with multiple dropdown components to use in your React app.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tryferos/Dropdown-Component"
+  },
   "keywords": [
     "react",
     "react-components",

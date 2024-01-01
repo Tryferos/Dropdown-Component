@@ -10,3 +10,4 @@ postcss.config.js
 .rollup
 tsconfig.json
 .tsbuildinfo
+dist/types
