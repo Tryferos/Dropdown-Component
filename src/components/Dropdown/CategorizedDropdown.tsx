@@ -45,7 +45,11 @@ export function CategorizedDropdown<T extends ReactNode & {}>(props: Categorized
         setItems(mappedItems);
 
         //*Check if it is the first render so we don't interfere with openByDefault option
-        if (renderedItems == props.categories) return;
+        if (renderedItems == props.categories) {
+            if (openByDefault) return;
+            setIsOpen(false);
+            return;
+        }
         setIsOpen(true);
     }
     const maxHeight = props.maxHeight || '250px';
