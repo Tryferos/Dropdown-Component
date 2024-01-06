@@ -2,6 +2,7 @@ import '../../tailwind.css'
 
 export {SimpleDropdown} from './SimpleDropdown.tsx'
 export {CategorizedDropdown} from './CategorizedDropdown.tsx'
+export {MenuDropdown} from './MenuDropdown.tsx'
 
 export enum DropdownSize {
     'sm' = '25',
